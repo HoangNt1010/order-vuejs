@@ -1,31 +1,116 @@
 import Vue from 'vue'
-import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
+import Router from 'vue-router'
+import Login from '../page/login/Login'
+import Register from '../page/register/Register'
+import Home from '../page/home/Home'
+import Order from '../page/order/Order'
+// import Edit from '../page/editOrder/Edit'
+import NotFound from '../page/notFound/NotFound'
+import Carousel from '../page/carousel/Carousel'
+import Socket from '../page/socket/Socket'
 
-Vue.use(VueRouter)
+Vue.use(Router)
 
-  const routes = [
-  {
-    path: '/',
-    name: 'Home',
-    component: Home
-  },
-  {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: function () {
-      return import(/* webpackChunkName: "about" */ '../views/About.vue')
-    }
-  }
-]
-
-const router = new VueRouter({
+const router = new Router({
   mode: 'history',
-  base: process.env.BASE_URL,
-  routes
-})
+  routes: [
+    {
+      path: '/',
+      name: 'login',
+      component: Login,
+      meta: {
+        isLogin: true
+      }
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: Register,
+      meta: {
+        isLogin: true
+      }
+    },
+    {
+      path: '/home',
+      name: 'home',
+      component: Home
+    },
+    {
+      path: '/order',
+      name: 'order',
+      component: Order
+    },
+    // {
+    //   path: '/edit/id',
+    //   name: 'edit',
+    //   component: Edit
+    // },
+    {
+      path: '/socket',
+      name: 'socket',
+      component: Socket
+    },
+    {
+      path: '/carousel',
+      name: 'carousel',
+      component: Carousel
+    },
+    {
+      path: '*',
+      name: 'notFound',
+      component: NotFound
+    }
+  ]
+});
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.isLogin)) {
+    if (Vue.$cookies.get("token")) {
+      next({
+        path: "/home",
+        query: {}
+      });
+    } else {
+      next();
+    }
+  } else {
+    next(); // make sure to always call next()!
+  }
+});
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.isLogin)) {
+    if (Vue.$cookies.get("token")) {
+      next({
+        path: "/home",
+        query: {}
+      });
+    } else {
+      next();
+    }
+  } else {
+    next(); // make sure to always call next()!
+  }
+});
+router.beforeEach((to, from, next) => {
+  if (to.name == "order" && !Vue.$cookies.get("token")) {
+    next({
+      path: "/",
+      query: {}
+    });
+  } else {
+    next();
+  }
+});
+router.beforeEach((to, from, next) => {
+  if (to.name == "home" && !Vue.$cookies.get("token")) {
+    next({
+      path: "/",
+      query: {}
+    });
+  } else {
+    next();
+  }
+});
 
-export default router
+
+
+export default router;
